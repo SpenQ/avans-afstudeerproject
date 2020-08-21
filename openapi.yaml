@@ -1,0 +1,204 @@
+openapi: "3.0.3"
+info:
+  version: 1.0.0
+  title: RABE keyserver
+  license:
+    name: MIT
+paths:
+  /auth/request-token:
+    post:
+      summary: Request authorization token
+      security:
+        - ldapAuth: []
+      tags:
+        - auth
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokenResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokenError"
+  /encrypt:
+    post:
+      summary: Encrypt a file or string
+      security:
+        - ldapToken: []
+      tags:
+        - crypto
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/encrypt_form_object"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/encrypt_json_object"
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/encrypt_response"
+                  - $ref: "#/components/schemas/Error"
+            form-data:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/encrypt_response"
+                  - $ref: "#/components/schemas/Error"
+  /decrypt:
+    post:
+      summary: Decrypt a file or string
+      security:
+        - ldapToken: []
+      tags:
+        - crypto
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/decrypt_form_object"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/decrypt_json_object"
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/decrypt_json_response"
+                  - $ref: "#/components/schemas/Error"
+            form-data:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/decrypt_form_response"
+                  - $ref: "#/components/schemas/Error"
+  /download/{id}:
+    get:
+      summary: Download an encrypted or decrypted file by it's id
+      security:
+        - ldapToken: []
+      tags:
+        - download
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the download to get
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+components:
+  securitySchemes:
+    ldapAuth:
+      type: http
+      scheme: basic
+    ldapToken:
+      type: http
+      scheme: basic
+  schemas:
+    encrypt_form_object:
+      required:
+        - type
+        - policy
+        - file
+      properties:
+        type:
+          type: string
+          enum: [file, string]
+        policy:
+          type: object
+        file:
+          type: string
+          format: binary
+    encrypt_json_object:
+      required:
+        - type
+        - policy
+        - pt
+      properties:
+        type:
+          type: string
+          enum: [file, string]
+        policy:
+          type: object
+        pt:
+          type: string
+    encrypt_response:
+      properties:
+        ct:
+          type: string
+    decrypt_json_object:
+      properties:
+        type:
+          type: string
+          enum: [file, string]
+        ct:
+          type: string
+    decrypt_form_object:
+      properties:
+        type:
+          type: string
+          enum: [string, file]
+        file:
+          type: object
+          format: binary
+    decrypt_json_response:
+      properties:
+        ct:
+          type: string
+    decrypt_form_response:
+      properties:
+        download_url:
+          type: string
+    AuthTokenResponse:
+      properties:
+        token:
+          type: string
+    AuthTokenError:
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        status:
+          type: number
+    Error:
+      required:
+        - message
+      properties:
+        error:
+          type: string
+    Policy:
+      properties:
+        or:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Policy'
+              - type: string
+        and:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Policy'
+              - type: string

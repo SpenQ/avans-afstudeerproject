@@ -1,0 +1,52 @@
+######
+### CALL RUST FROM PYTHON: https://bheisler.github.io/post/calling-rust-in-python/
+######
+
+docker container met flask api
+config met ldap connection
+init -> setup abe met attribute schema voor encryptie adresentry/pdf
+bijv:
+    { 
+        "OR": {
+            "admin",
+            {
+                "OR": {
+                    customer1,
+                    {
+                        "AND": {
+                            employee,
+                            warehouse1
+                        }
+                    }
+            }
+        }
+    }
+    #evt timeslots toevoegen?
+config contains:
+attribute that defines warehouse in ldap
+attribute that defines user (cn?) in ldap
+policy to create/read/update/delete
+api should have internal (authorized?) function to add new warehouse or customer? -> should be saved in internal db, with extensionable setup that gets locked in key-value pairs in own db, e.g. sets of 100
+
+
+cron:
+1. get users from ldap
+2. add new users to rabe and remove unknown users from rabe - update attributes of all users?
+
+api:
+1. get(username, password/auth?, object-id) -> decrypt
+2. put(username, password/auth?, object-id, opt: new_policy?) -> encrypt
+3. encrypt(policy, object)
+4. decrypt(username, password/auth?, object)
+5. add customer
+6. remove customer
+
+db:
+1. save users?
+2. hold state of rabe-session usage
+
+test:
+#todo
+
+
+load testing met apache jmeter: https://jmeter.apache.org/

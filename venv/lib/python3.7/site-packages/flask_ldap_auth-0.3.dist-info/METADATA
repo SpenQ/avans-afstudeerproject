@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: flask-ldap-auth
+Version: 0.3
+Summary: Simple Flask extension to allow authentication with a LDAP server
+Home-page: https://github.com/drowolath/flask-ldap-auth
+Author: Thomas Ayih-Akakpo
+Author-email: thomas@ayih-akakpo.org
+License: MIT
+Download-URL: https://github.com/drowolath/flask-ldap-auth/archive/0.3.zip
+Keywords: python3,flask,ldap,extension,authentication
+Platform: UNKNOWN
+Requires-Dist: Flask
+Requires-Dist: python-ldap
+
+UNKNOWN
+
+
